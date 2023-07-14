@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-export function TwitterFollowCard ({formatUserName,userName='unknown', name, initialIsFollowing}) {
+export function TwitterFollowCard ({userName='unknown', name, initialIsFollowing}) {
     //2 maneras de escribirlo
     // const state = useState(false)
     // const isFollowing = state[0] //el valor del estado
@@ -22,7 +22,7 @@ export function TwitterFollowCard ({formatUserName,userName='unknown', name, ini
                 <img src={imageSrc} alt={altAvatar} className='tw-followCard-avatar'/>
                 <div className='tw-followCard-info'>
                     <strong>{name}</strong>
-                    <span className='tw-followCard-info-userName'>{formatUserName(userName)}</span>
+                    <span className='tw-followCard-info-userName'>@{userName}</span>
                 </div>
             </header>
             <aside>
