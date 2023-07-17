@@ -9,8 +9,14 @@ import { WinnerModal } from './components/WinnerModal'
 
 function App() {
 
-  const [board, setBoard] = useState(Array(9).fill(null)) //tablero de juego
-  const [turn, setTurn] = useState(TURNS.X) // estado del turn
+  // modificamos para leer la partida guardada
+  const [board, setBoard] = useState(() => {
+    const boardFormStorage = window.localStorage.getItem('board') //recuperamos el local storage dentro de la funcion del estado porque hacerlo fuera en el cuerpo hace que se ejecute sin sentido en cada renderizado
+    return boardFormStorage ? JSON.parse(boardFormStorage) : Array(9).fill(null) }) //tablero de juego
+
+  const [turn, setTurn] = useState(()=>{
+    const turnFormStorage = window.localStorage.getItem('turn')
+    return turnFormStorage ? JSON.parse(turnFormStorage) : TURNS.X }) // estado del turn
   const [winner, setWinner] = useState(null) // null que no hay ganador y con GameResult cambimos el estado de los ganadores
 
  
@@ -19,6 +25,10 @@ function App() {
     setBoard(Array(9).fill(null))
     setTurn(TURNS.X)
     setWinner(null)
+
+    // nos aseguramos que al resetear el juego se limpie el localStorage
+    window.localStorage.removeItem('board')
+    window.localStorage.removeItem('turn')
   }
 
   const checkEndGame = (newBoard) => {
@@ -39,6 +49,9 @@ function App() {
     // Cambiamos el turn
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X
     setTurn(newTurn)
+    //guardamos la partida aqui, despues del cambio de turno
+    window.localStorage.setItem('board', JSON.stringify(newBoard)) // con el JSON.stringify le decimos que lo guarde como string pero que luego podamos recuperar el array
+    window.localStorage.setItem('turn', JSON.stringify(newTurn)) 
 
     // revisar ganador
     const newWinner = checkWinner(newBoard)
