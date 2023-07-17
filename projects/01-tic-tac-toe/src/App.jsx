@@ -1,45 +1,11 @@
 import { useState } from 'react'
 import './App.css'
+import confetti from 'canvas-confetti'
+import { Square } from './components/Square'
+import { TURNS, GameResult} from './constants'
+import { checkWinner } from './logic/board'
+import { WinnerModal } from './components/WinnerModal'
 
-const TURNS = {
-  X : 'X',
-  O : 'O'
-}
-
-const GameResult = {
-  X : 'X wins',
-  O : 'O wins',
-  Draw : 'Draw',
-}
-
-
-
-const Square = ({children, isSelected , updateBoard, index}) => {
-
-  const className = `square ${isSelected ? 'is-selected' :''}`
-
-  const handleClick = () =>{
-    updateBoard(index);
-  }
-
-  return(
-    <div onClick={handleClick} className={className}>
-      {children}
-    </div>
-  )
-
-}
-
-const WINNER_COMBOS = [
-  [0,1,2],
-  [3,4,5],
-  [6,7,8],
-  [0,3,6],
-  [1,4,7],
-  [2,5,8],
-  [0,4,8],
-  [2,4,6]
-]
 
 function App() {
 
@@ -47,17 +13,7 @@ function App() {
   const [turn, setTurn] = useState(TURNS.X) // estado del turn
   const [winner, setWinner] = useState(null) // null que no hay ganador y con GameResult cambimos el estado de los ganadores
 
-  const checkWinner =(boardToCheck) => {
-    for (const combo of WINNER_COMBOS){
-      const [a,b,c] = combo
-      if (boardToCheck[a] && boardToCheck[a] === boardToCheck[b] && boardToCheck[a] === boardToCheck[c]){
-        // setWinner(GameResult.boardToCheck[a])
-        return boardToCheck[a]
-      }
-    }
-    //no hay ganador
-    return null
-  }
+ 
 
   const resetGame = () => {
     setBoard(Array(9).fill(null))
@@ -67,6 +23,10 @@ function App() {
 
   const checkEndGame = (newBoard) => {
     return newBoard.every((square) => square !== null) // si todos los squares (posiciones) son distintos a null termna el juego y da un empate
+  }
+
+  const checkStartGame = (newBoard) => {
+    return newBoard.every((square) => square === null)
   }
 
   const updateBoard = (index) => {
@@ -83,11 +43,20 @@ function App() {
     // revisar ganador
     const newWinner = checkWinner(newBoard)
     if (newWinner) {
+      confetti()
       setWinner(newWinner)
       }
       // chequear que el juego termino 
       else if (checkEndGame(newBoard)) {
         setWinner(GameResult.Draw)
+      }
+    }
+
+    const changeTurn = () =>{
+      if (board.every(square => square === null)){ // se verifica si todo el board es null para cambiar el turn, si no son todos null no se cambia
+        setTurn(turn === TURNS.X? TURNS.O : TURNS.X)
+      }else {
+        alert("No se puede cambiar el turno si hay una partida iniciada")
       }
     }
 
@@ -97,7 +66,7 @@ function App() {
         <h1>Tic Tac Toe</h1>
         <section className='game'>
           {
-            board.map((_, index) =>{
+             board.map((_, index) =>{ //el _ se refiere al square, lo que hay dentro
               return (
                 <Square
                 key={index}
@@ -120,35 +89,12 @@ function App() {
                   </Square>
         </section>
         <button onClick={resetGame}>Restart</button>
-        {/* elegir turno
+         {/*elegir turno*/}
          <section className='controls'>
-          <button onClick={() => setTurn(TURNS.X)}>X</button>
-          <button onClick={() => setTurn(TURNS.O)}>O</button>
-        </section> */}
+          <button onClick={changeTurn}>Change Turn</button>
+        </section> 
 
-        {
-          winner !== null && (
-            <section className='winner'>
-              <div className='text'>
-              <h2>{
-                winner === GameResult.Draw
-                ? 'Draw'
-                : winner === GameResult.X
-                ? 'Winner'
-                : 'Winner' 
-              }
-              </h2>
-
-              <header className='win'>
-                {winner && <Square>{winner}</Square>}
-              </header>
-              <footer>
-                <button onClick={resetGame}>Restart</button>
-              </footer>
-              </div>
-            </section>
-          )
-        }
+       <WinnerModal winner={winner} resetGame={resetGame} GameResult={GameResult} />
 
         
       </main>
