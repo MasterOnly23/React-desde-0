@@ -4,8 +4,8 @@ export const TURNS = {
   }
   
 export const GameResult = {
-    X : 'X wins',
-    O : 'O wins',
+    X : '❌ wins',
+    O : '⚪ wins',
     Draw : 'Draw',
   }
   
